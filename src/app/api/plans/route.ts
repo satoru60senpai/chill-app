@@ -9,7 +9,6 @@ import type { OutingPlanDraft } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 function rowToPlan(row: any): OutingPlanDraft {
   const totals = JSON.parse(row.totals || '{}');
   const eventBonus = row.eventBonus ? JSON.parse(row.eventBonus) : undefined;

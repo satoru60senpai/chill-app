@@ -24,7 +24,7 @@ export function unauthorized(): Response {
 
 // ---- Convertisseurs DB -> types applicatifs ----
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 export function dbToPlace(row: any): Place {
   return {
     id: row.id,

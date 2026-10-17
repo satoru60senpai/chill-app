@@ -1,0 +1,33 @@
+{
+  "name": "Chill — On fait quoi aujourd'hui ?",
+  "short_name": "Chill",
+  "description": "Idées de sorties, programmes et bonnes adresses à Lomé, adaptées à ton mood et ton budget.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDF7EF",
+  "theme_color": "#FDF7EF",
+  "categories": ["lifestyle", "travel", "food"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

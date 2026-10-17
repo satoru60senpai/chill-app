@@ -1,0 +1,55 @@
+name: Build APK Android (Chill)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Java 17 (Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Installer les dépendances
+        run: npm install
+
+      - name: Build web statique hors-ligne
+        run: npm run build:offline
+
+      - name: Préparer le projet Android (Capacitor)
+        run: |
+          npx cap add android || npx cap sync android
+          npx @capacitor/assets generate --android --assetPath assets || echo "⚠ Icônes par défaut conservées"
+          npx cap sync android
+
+      - name: Construire l'APK (debug signé, installable)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Préparer l'artefact
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/Chill-v1.0.0.apk
+          ls -lh dist/
+
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chill-APK
+          path: dist/Chill-v1.0.0.apk
+          if-no-files-found: error

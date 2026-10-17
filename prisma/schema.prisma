@@ -1,0 +1,139 @@
+// ============================================================
+// Chill — Schéma de base de données (Prisma + SQLite)
+// Entités du cahier des charges §11 : lieux, catégories, moods,
+// programmes de sortie, favoris, événements, collections, signalements.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Lieu ou établissement (fiche détaillée §5.7)
+model Place {
+  id           String  @id
+  name         String
+  category     String // restaurant | cafe | beach | nature | lounge | culture | shopping | sport | night | spa
+  description  String
+  district     String
+  address      String
+  priceFrom    Int // FCFA, 0 = gratuit
+  priceHint    String
+  rating       Float
+  reviewCount  Int     @default(0)
+  imageUrl     String
+  latitude     Float
+  longitude    Float
+  phone        String  @default("")
+  hours        String
+  moods        String // JSON string[]
+  slots        String // JSON SlotKey[]
+  durationHint String  @default("")
+  services     String // JSON string[]
+  accessNote   String  @default("")
+  reliability  String  @default("estime") // confirme | partenaire | estime
+  lastVerified String  @default("")
+  isSponsored  Boolean @default(false)
+  isPopular    Boolean @default(false)
+
+  favorites         Favorite[]
+  collectionPlaces  CollectionPlace[]
+  reports           Report[]
+}
+
+/// Collection éditoriale de sorties (§5.13)
+model Collection {
+  id         String  @id
+  title      String
+  subtitle   String  @default("")
+  badge      String  @default("")
+  coverImage String
+  isFeatured Boolean @default(false)
+
+  collectionPlaces CollectionPlace[]
+}
+
+/// Jointure ordonnée collection <-> lieux
+model CollectionPlace {
+  collectionId String
+  placeId      String
+  order        Int @default(0)
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  place      Place      @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, placeId])
+}
+
+/// Événement local (week-end, §5.6)
+model Event {
+  id          String @id
+  title       String
+  description String
+  venue       String
+  timeText    String
+  priceLabel  String
+  imageUrl    String
+  category    String @default("")
+}
+
+/// Mood / envie (§5.2)
+model Mood {
+  key   String @id
+  label String
+  short String
+  emoji String
+  color String
+  order Int    @default(0)
+}
+
+/// Programme de sortie généré puis enregistré (§5.5, §5.10)
+model OutingPlan {
+  id              String   @id
+  deviceId        String
+  title           String
+  moodKey         String
+  moodLabel       String   @default("")
+  dayLabel        String   @default("")
+  timeLabel       String   @default("")
+  budgetPerPerson Int      @default(0)
+  strict          Boolean  @default(false)
+  peopleCount     Int      @default(1)
+  durationLabel   String   @default("")
+  steps           String // JSON OutingStep[]
+  totals          String // JSON totals
+  breakdown       String // JSON BudgetLine[]
+  eventBonus      String? // JSON eventBonus
+  status          String   @default("planned") // planned | done
+  createdAt       DateTime @default(now())
+
+  @@index([deviceId])
+}
+
+/// Favori utilisateur (§5.10)
+model Favorite {
+  id        String   @id @default(cuid())
+  deviceId  String
+  placeId   String
+  createdAt DateTime @default(now())
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, placeId])
+  @@index([deviceId])
+}
+
+/// Signalement d'information incorrecte (§12)
+model Report {
+  id        String   @id @default(cuid())
+  placeId   String
+  message   String
+  handled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+}

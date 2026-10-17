@@ -63,3 +63,4 @@ agent-ctx/
 examples/
 Caddyfile
 .github/workflows/build-apk.yml
+download/\ntests/\nmini-services/
